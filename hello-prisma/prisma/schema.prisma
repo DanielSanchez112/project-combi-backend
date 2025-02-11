@@ -1,14 +1,115 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model checadores {
+  id_checador Int       @id @default(autoincrement())
+  id_usuario  Int?
+  id_parada   Int?
+  paradas     paradas?  @relation(fields: [id_parada], references: [id_parada], onDelete: Cascade, map: "fk_checador_parada")
+  usuarios    usuarios? @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, map: "fk_checador_usuario")
+}
+
+model conductores {
+  id_conductor Int        @id @default(autoincrement())
+  id_vehiculo  Int?
+  id_usuario   Int?
+  usuarios     usuarios?  @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, map: "fk_conductor_usuario")
+  vehiculos    vehiculos? @relation(fields: [id_vehiculo], references: [id_vehiculo], onDelete: Cascade, map: "fk_conductor_vehiculo")
+}
+
+model duenos {
+  id_dueno    Int        @id @default(autoincrement())
+  id_vehiculo Int?
+  id_usuario  Int?
+  usuarios    usuarios?  @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, map: "fk_dueno_usuario")
+  vehiculos   vehiculos? @relation(fields: [id_vehiculo], references: [id_vehiculo], onDelete: Cascade, map: "fk_dueno_vehiculo")
+}
+
+model paradas {
+  id_parada             Int                     @id @default(autoincrement())
+  latitud               Decimal?                @db.Decimal
+  longitud              Decimal?                @db.Decimal
+  activo                Int?                    @db.SmallInt
+  nombre                String?                 @db.VarChar(255)
+  checadores            checadores[]
+  rutas_paradas_ordenes rutas_paradas_ordenes[]
+}
+
+model pasajaeros {
+  id_pasajero Int       @id
+  id_usuario  Int?
+  usuarios    usuarios? @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, map: "fk_pasajero_usuario")
+}
+
+model personas {
+  id_persona   Int        @id @default(autoincrement())
+  nombre       String?    @db.VarChar(255)
+  apellido_pat String?    @db.VarChar(255)
+  apellido_mat String?    @db.VarChar(255)
+  sexo         Int?       @db.SmallInt
+  fecha_nac    DateTime?  @db.Date
+  curp         String?    @db.VarChar(255)
+  rfc          String?    @db.VarChar(255)
+  activo       Int?       @db.SmallInt
+  usuarios     usuarios[]
+}
+
+model rutas {
+  id_ruta               Int                     @id @default(autoincrement())
+  nombre                String?                 @db.VarChar(255)
+  activo                Int?                    @db.SmallInt
+  rutas_paradas_ordenes rutas_paradas_ordenes[]
+}
+
+model rutas_paradas_ordenes {
+  id_rutas_paradas_orden Int        @id @default(autoincrement())
+  id_ruta                Int?
+  id_parada              Int?
+  id_vehiculo            Int?
+  orden                  Int?
+  activo                 Int?       @db.SmallInt
+  paradas                paradas?   @relation(fields: [id_parada], references: [id_parada], onDelete: Cascade, map: "fk_rutas_paradas_parada")
+  rutas                  rutas?     @relation(fields: [id_ruta], references: [id_ruta], onDelete: Cascade, map: "fk_rutas_paradas_ruta")
+  vehiculos              vehiculos? @relation(fields: [id_vehiculo], references: [id_vehiculo], onDelete: Cascade, map: "fk_rutas_paradas_vehiculo")
+}
+
+model tipo_usuarios {
+  id_tipo_usuario Int        @id @default(autoincrement())
+  nombre          String?    @db.VarChar(255)
+  descripcion     String?    @db.VarChar(255)
+  activo          Int?       @db.SmallInt
+  usuarios        usuarios[]
+}
+
+model usuarios {
+  id_usuario      Int            @id @default(autoincrement())
+  id_persona      Int?
+  id_tipo_usuario Int?
+  usuario         String?        @db.VarChar(255)
+  contrasena      String?        @db.VarChar(255)
+  correo          String?        @db.VarChar(255)
+  activo          Int?           @db.SmallInt
+  checadores      checadores[]
+  conductores     conductores[]
+  duenos          duenos[]
+  pasajaeros      pasajaeros[]
+  personas        personas?      @relation(fields: [id_persona], references: [id_persona], onDelete: Cascade, map: "fk_usuario_persona")
+  tipo_usuarios   tipo_usuarios? @relation(fields: [id_tipo_usuario], references: [id_tipo_usuario], onDelete: Cascade, map: "fk_usuario_tipo")
+}
+
+model vehiculos {
+  id_vehiculo           Int                     @id @default(autoincrement())
+  numero                String?                 @db.VarChar(255)
+  matricula             String?                 @db.VarChar(255)
+  activo                String?                 @db.VarChar(255)
+  conductores           conductores[]
+  duenos                duenos[]
+  rutas_paradas_ordenes rutas_paradas_ordenes[]
 }
