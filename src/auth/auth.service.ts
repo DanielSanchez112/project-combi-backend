@@ -11,10 +11,19 @@ export class AuthService {
       where: { usuario: username },
     });
 
-    if (user && await bcrypt.compare(password, user.contrasena)) {
+
+
+    if (user) {
+    console.log('Usuario encontrado:', user); // Log para depuración
+    const isPasswordValid = await bcrypt.compare(password, user.contrasena);
+    console.log('¿Contraseña válida?', isPasswordValid); // Log para depuración
+
+    if (isPasswordValid) {
       const { contrasena, ...result } = user;
       return result;
     }
+  }
+
     return null;
   }
 }
