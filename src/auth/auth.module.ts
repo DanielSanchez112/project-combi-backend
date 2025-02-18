@@ -10,7 +10,7 @@ import {PrismaModule} from '../prisma.module'
     PrismaModule,
     JwtModule.register({
       global: true,
-      secret: 'tu_secret_key', // Usa variables de entorno en producción
+      secret: 'mi_secreto123', // Usa variables de entorno en producción
       signOptions: { expiresIn: '1d' },
     }),
   ],
