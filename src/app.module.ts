@@ -3,6 +3,7 @@ import { TipoUsuarioModule } from './tipos_usuario/tipo_usuario.module';
 import { PersonaModule } from './persona/persona.module';
 import { UsuariosModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { AuthModule } from './auth/auth.module';
     UsuariosModule,
     AuthModule,
   ],
-  controllers: [], // Controladores globales si los necesitas
-  providers: [], // Servicios globales si los necesitas
+  providers: [PrismaService],
 })
+
 export class AppModule {}
