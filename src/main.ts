@@ -6,13 +6,16 @@ dotenv.config();
 
 
 async function boostrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {cors: true});
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true
   }))
 
+
   await app.listen(process.env.PORT || 3000)
 }
+
+
 boostrap()
