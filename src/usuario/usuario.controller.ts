@@ -1,18 +1,17 @@
-import { Controller, Post, Body, Get, ParseIntPipe, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, ParseIntPipe, Param, Req } from '@nestjs/common';
 import { UsuariosService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create_usuario.dto';
-import { request } from 'http';
 
 @Controller('usuarios')
 export class UsuariosController {
     constructor(private readonly usuariosService: UsuariosService) {}
 
     @Post()
-    create(@Body() createUsuarioDto: CreateUsuarioDto) {
-        return this.usuariosService.create(createUsuarioDto);
-        console.log(request);
-        console.log(Body);    
-      }
+    create(@Req() request: Request, @Body() createUsuarioDto: CreateUsuarioDto) {
+      console.log('Request:', request);
+      console.log('Body:', createUsuarioDto);
+      return this.usuariosService.create(createUsuarioDto);
+  }
 
     @Get()
     findAll() {

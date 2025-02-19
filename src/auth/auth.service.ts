@@ -3,6 +3,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -53,13 +54,15 @@ export class AuthService {
         username: usuario.usuario,
         tipo: usuario.tipo_usuarios?.id_tipo_usuario,
       };
-
+      console.log('Payload:', payload);
+     console.log('Usuario:', usuario);
       return {
         access_token: await this.jwtService.signAsync(payload),
         usuario: {
           id: usuario.id_usuario,
           usuario: usuario.usuario,
           tipo_usuario: usuario.tipo_usuarios,
+          correo: usuario.correo,
         },
       };
     } catch (error) {
