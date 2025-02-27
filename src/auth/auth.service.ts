@@ -1,9 +1,9 @@
-import {PrismaService} from '../prisma.service'
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { Injectable, UnauthorizedException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
-import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -13,41 +13,51 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto) {
-    if (!loginDto.usuario || !loginDto.contrasena) {
-      throw new BadRequestException('Usuario y contraseña son requeridos');
+    // Validar que los datos sean cadenas de texto y no estén vacíos
+    if (!loginDto.usuario || typeof loginDto.usuario !== 'string' || 
+        !loginDto.contrasena || typeof loginDto.contrasena !== 'string') {
+      throw new BadRequestException('Usuario y contraseña son requeridos y deben ser cadenas de texto');
     }
 
-    // Buscar usuario
-    const usuario = await this.prisma.usuarios.findFirst({
-      where: {
-        usuario: loginDto.usuario,
-        activo: 1,
-      },
-      include: {
-        tipo_usuarios: true,
-      },
-    });
+    let usuario;
+    try {
+      // Buscar usuario en la base de datos
+      usuario = await this.prisma.usuarios.findFirst({
+        where: {
+          usuario: loginDto.usuario,
+          activo: 1,
+        },
+        include: {
+          tipo_usuarios: true,
+        },
+      });
 
-    if (!usuario) {
-      throw new UnauthorizedException('Credenciales incorrectas');
-    }
+      if (!usuario) {
+        throw new UnauthorizedException('Credenciales incorrectas');
+        throw new HttpException('Correo o contraseña incorrectos', HttpStatus.UNAUTHORIZED);
+      }
 
-    // Verificar que la contraseña en la base de datos no sea nula
-    if (!usuario.contrasena) {
-      throw new UnauthorizedException('Error en la configuración de la cuenta');
+      if (!usuario.contrasena) {
+        throw new UnauthorizedException('Error en la configuración de la cuenta');
+      }
+    } catch (error) {
+      console.error('Error al consultar la base de datos:', error);
+      throw new InternalServerErrorException('Error interno del servidor, intenta más tarde');
     }
 
     try {
-      // Verificar contraseña
-      const isPasswordValid = await bcrypt.compare(
-        loginDto.contrasena,
-        usuario.contrasena,
-      );
+      // Verificar la contraseña
+      const isPasswordValid = await bcrypt.compare(loginDto.contrasena, usuario.contrasena);
 
       if (!isPasswordValid) {
         throw new UnauthorizedException('Credenciales incorrectas');
       }
+    } catch (error) {
+      console.error('Error en la verificación de contraseña:', error);
+      throw new InternalServerErrorException('Error en la autenticación, intenta más tarde');
+    }
 
+    try {
       // Generar JWT
       const payload = {
         sub: usuario.id_usuario,
@@ -55,7 +65,7 @@ export class AuthService {
         tipo: usuario.tipo_usuarios?.id_tipo_usuario,
       };
       console.log('Payload:', payload);
-     console.log('Usuario:', usuario);
+      console.log('Usuario:', usuario);
       return {
         access_token: await this.jwtService.signAsync(payload),
         usuario: {
@@ -66,8 +76,8 @@ export class AuthService {
         },
       };
     } catch (error) {
-      console.error('Error en la verificación de contraseña:', error);
-      throw new UnauthorizedException('Error en la autenticación');
+      console.error('Error al generar el token JWT:', error);
+      throw new InternalServerErrorException('Error en la autenticación, intenta más tarde');
     }
   }
 
@@ -77,3 +87,4 @@ export class AuthService {
     return bcrypt.hash(password, saltRounds);
   }
 }
+

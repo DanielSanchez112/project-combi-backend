@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUsuarioDto } from './dto/create_usuario.dto';
 import { PersonaService } from '../persona/persona.service';
@@ -12,25 +12,23 @@ export class UsuariosService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    try {
-      // Verificamos si hay datos de persona
-      if (!createUsuarioDto.persona) {
-        createUsuarioDto.persona = {}; // Creamos un objeto vacío si no hay datos de persona
-      }
+    if (!createUsuarioDto.usuario || !createUsuarioDto.contrasena || !createUsuarioDto.correo || !createUsuarioDto.id_tipo_usuario) {
+      throw new BadRequestException('Todos los campos son obligatorios: usuario, contraseña, correo, id_tipo_usuario');
+    }
   
-      // Creamos la persona
+    try {
+      createUsuarioDto.persona = createUsuarioDto.persona || {};
+  
+      // Crear la persona
       const persona = await this.personaService.create(createUsuarioDto.persona);
       if (!persona) {
-        throw new HttpException('Error al crear la persona', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Error al crear la persona asociada');
       }
   
-      // Encriptamos la contraseña
+      // Encriptar la contraseña
       const hashedPassword = await bcrypt.hash(createUsuarioDto.contrasena, 10);
-      if (!hashedPassword) {
-        throw new HttpException('Error al encriptar la contraseña', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
   
-      // Creamos el usuario con el id_persona obtenido
+      // Crear el usuario en la base de datos
       const usuario = await this.prisma.usuarios.create({
         data: {
           usuario: createUsuarioDto.usuario,
@@ -45,49 +43,62 @@ export class UsuariosService {
         },
       });
   
-      if (!usuario) {
-        throw new HttpException('Error al crear el usuario', HttpStatus.BAD_REQUEST);
+      return {
+        id_usuario: usuario.id_usuario,
+        usuario: usuario.usuario,
+        correo: usuario.correo,
+        id_tipo_usuario: usuario.id_tipo_usuario,
+        persona: {
+          nombre: usuario.personas.nombre,
+          apellido_pat: usuario.personas.apellido_pat,
+          apellido_mat: usuario.personas.apellido_mat,
+          sexo: usuario.personas.sexo,
+          fecha_nac: usuario.personas.fecha_nac,
+          curp: usuario.personas.curp,
+          rfc: usuario.personas.rfc,
+        },
+      };
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+  
+      if (error.code === 'P2002') {
+        throw new BadRequestException('El usuario o correo ya están en uso');
       }
   
-      const { contrasena, ...usuarioSinContrasena } = usuario;
-      return usuarioSinContrasena;
-    } catch (error) {
-      throw new HttpException(error.message || 'Error interno del servidor', error.status || HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException('Error interno al registrar el usuario');
     }
   }
   
 
   async findOne(id: number) {
-    const usuario = await this.prisma.usuarios.findUnique({
-      where: {
-        id_usuario: id
-      },
-      include: {
-        personas: true,
-        tipo_usuarios: true
+    try {
+      const usuario = await this.prisma.usuarios.findUnique({
+        where: { id_usuario: id },
+        include: { personas: true, tipo_usuarios: true },
+      });
+
+      if (!usuario) {
+        throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
       }
-    });
 
-    if (!usuario) {
-      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+      const { contrasena, ...result } = usuario;
+      return result;
+    } catch (error) {
+      console.error(`Error al buscar usuario con ID ${id}:`, error);
+      throw new InternalServerErrorException('Error interno al buscar el usuario');
     }
-
-    const { contrasena, ...result } = usuario;
-    return result;
   }
 
   async findAll() {
-    const usuarios = await this.prisma.usuarios.findMany({
-      include: {
-        personas: true,
-        tipo_usuarios: true
-      }
-    });
+    try {
+      const usuarios = await this.prisma.usuarios.findMany({
+        include: { personas: true, tipo_usuarios: true },
+      });
 
-    // Ocultamos la contraseña de los usuarios
-    return usuarios.map(usuario => {
-      const { contrasena, ...result } = usuario;
-      return result;
-    });
+      return usuarios.map(({ contrasena, ...usuario }) => usuario);
+    } catch (error) {
+      console.error('Error al obtener usuarios:', error);
+      throw new InternalServerErrorException('Error interno al obtener los usuarios');
+    }
   }
 }
