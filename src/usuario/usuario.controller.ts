@@ -1,8 +1,12 @@
-import { Controller, Post, Body, Get, ParseIntPipe, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, ParseIntPipe, Param, Req, UsePipes, ValidationPipe, UseInterceptors, UseFilters } from '@nestjs/common';
 import { UsuariosService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create_usuario.dto';
+import { SuccessInterceptor } from 'src/SI';
+import { GlobalExceptionFilter } from 'src/GEF';
 
 @Controller('usuarios')
+@UseFilters(new GlobalExceptionFilter())
+@UseInterceptors(SuccessInterceptor)
 export class UsuariosController {
     constructor(private readonly usuariosService: UsuariosService) {}
 

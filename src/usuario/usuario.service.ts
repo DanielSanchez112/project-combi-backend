@@ -1,14 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, UseFilters } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUsuarioDto } from './dto/create_usuario.dto';
 import { PersonaService } from '../persona/persona.service';
+import { DuenoService } from '../dueños/dueños.service';
 import * as bcrypt from 'bcrypt';
+import { GlobalExceptionFilter } from 'src/GEF';
 
 @Injectable()
 export class UsuariosService {
   constructor(
     private prisma: PrismaService,
     private personaService: PersonaService,
+    private duenoService: DuenoService,
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
@@ -42,22 +45,31 @@ export class UsuariosService {
           personas: true,
         },
       });
-  
-      return {
-        id_usuario: usuario.id_usuario,
-        usuario: usuario.usuario,
-        correo: usuario.correo,
-        id_tipo_usuario: usuario.id_tipo_usuario,
-        persona: {
-          nombre: usuario.personas.nombre,
-          apellido_pat: usuario.personas.apellido_pat,
-          apellido_mat: usuario.personas.apellido_mat,
-          sexo: usuario.personas.sexo,
-          fecha_nac: usuario.personas.fecha_nac,
-          curp: usuario.personas.curp,
-          rfc: usuario.personas.rfc,
-        },
-      };
+      if (usuario.id_tipo_usuario == 2){
+        const dueno = await this.duenoService.create({
+          id_usuario: usuario.id_usuario,
+        })
+
+        return {
+          id_usuario: usuario.id_usuario,
+          usuario: usuario.usuario,
+          correo: usuario.correo,
+          id_tipo_usuario: usuario.id_tipo_usuario,
+          persona: {
+            nombre: usuario.personas.nombre,
+            apellido_pat: usuario.personas.apellido_pat,
+            apellido_mat: usuario.personas.apellido_mat,
+            sexo: usuario.personas.sexo,
+            fecha_nac: usuario.personas.fecha_nac,
+            curp: usuario.personas.curp,
+            rfc: usuario.personas.rfc,
+          },
+          dueno: { 
+            id_dueno: dueno.id_dueno
+          },
+        }
+      }
+      
     } catch (error) {
       console.error('Error al registrar usuario:', error);
   
