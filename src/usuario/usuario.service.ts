@@ -4,6 +4,7 @@ import { CreateUsuarioDto } from './dto/create_usuario.dto';
 import { PersonaService } from '../persona/persona.service';
 import { DuenoService } from '../dueños/dueños.service';
 import { ConductoresService } from '../conductores/conductores.service';
+import { ChecadorService } from '../checadores/checadores.service'
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class UsuariosService {
     private personaService: PersonaService,
     private duenoService: DuenoService,
     private conductoresService: ConductoresService,
+    private checadorService: ChecadorService
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
@@ -60,6 +62,9 @@ export class UsuariosService {
       } else if (usuario.id_tipo_usuario == 3) { // Conductor
         const conductor = await this.conductoresService.create({ id_usuario: usuario.id_usuario });
         additionalData = { conductor: { id_conductor: conductor.id_conductor } };
+      }else if (usuario.id_tipo_usuario == 4) { // Checador
+        const checador = await this.checadorService.create({ id_usuario: usuario.id_usuario });
+        additionalData = { checador: { id_checador: checador.id_checador } };
       }
   
       console.log('🎉 Usuario creado:', usuario);
