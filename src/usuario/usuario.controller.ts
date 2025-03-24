@@ -2,10 +2,8 @@ import { Controller, Post, Body, Get, ParseIntPipe, Param, Req, UsePipes, Valida
 import { UsuariosService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create_usuario.dto';
 import { SuccessInterceptor } from 'src/SI';
-import { GlobalExceptionFilter } from 'src/GEF';
 
 @Controller('usuarios')
-@UseFilters(new GlobalExceptionFilter())
 @UseInterceptors(SuccessInterceptor)
 export class UsuariosController {
     constructor(private readonly usuariosService: UsuariosService) {}
@@ -13,6 +11,7 @@ export class UsuariosController {
     @Post()
     @UsePipes(new ValidationPipe({ whitelist: true })) 
     create(@Req() request: Request, @Body() createUsuarioDto: CreateUsuarioDto) {
+      console.log('🔥 Datos recibidos:', JSON.stringify(createUsuarioDto, null, 2))
       console.log('Request:', request);
       console.log('Body:', createUsuarioDto);
       return this.usuariosService.create(createUsuarioDto);

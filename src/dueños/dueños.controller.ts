@@ -1,9 +1,12 @@
-import { Controller, Post, Body, Get, Delete, Patch, Param} from "@nestjs/common";
+import { Controller, Post, Body, Get, Delete, Patch, Param,UseFilters, UseInterceptors } from "@nestjs/common";
 import { DuenoService } from "./dueños.service";
 import { CreateDueñoDto } from "./dto/create_dueño.dto";
-
+import { GlobalExceptionFilter } from "src/GEF";
+import { SuccessInterceptor } from "src/SI";
 
 @Controller('duenos')
+@UseFilters(new GlobalExceptionFilter())
+@UseInterceptors(SuccessInterceptor)
 export class DuenoController{
     constructor(private readonly duenoService: DuenoService) {}
 
