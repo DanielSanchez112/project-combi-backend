@@ -1,8 +1,9 @@
 import { Decimal } from "@prisma/client/runtime/library"
-import { IsDecimal, IsOptional } from "class-validator"
+import { IsDecimal, IsOptional, IsString } from "class-validator"
 
 
 export class CreateParadaDto{
+    @IsString()
     nombre: string
 
     @IsDecimal()
