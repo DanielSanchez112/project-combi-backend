@@ -4,6 +4,7 @@ import { PersonaModule } from './persona/persona.module';
 import { UsuariosModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma.service';
+import { VehiculosModule } from './vehiculos/vehiculos.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PrismaService } from './prisma.service';
     PersonaModule,
     UsuariosModule,
     AuthModule,
+    VehiculosModule,
   ],
   providers: [PrismaService],
 })

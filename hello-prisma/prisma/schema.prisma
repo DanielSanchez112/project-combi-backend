@@ -50,6 +50,7 @@ model rutas {
   nombre              String?               @db.VarChar(255)
   activo              Int?                  @db.SmallInt
   rutas_paradas_orden rutas_paradas_orden[]
+  vehiculos           vehiculos[]
 }
 
 model usuarios {
@@ -68,14 +69,14 @@ model usuarios {
 }
 
 model vehiculos {
-  id_vehiculos        Int                   @id @default(autoincrement())
-  id_dueno            Int?
-  numero              String?               @db.VarChar(255)
-  matricula           String?               @db.VarChar(255)
-  activo              String?               @db.VarChar(255)
-  conductor           conductor[]
-  rutas_paradas_orden rutas_paradas_orden[]
-  duenos              duenos?               @relation(fields: [id_dueno], references: [id_dueno], onDelete: NoAction, onUpdate: NoAction, map: "fk_vehiculos_duenos")
+  id_vehiculos Int     @id @default(autoincrement())
+  id_dueno     Int?
+  id_ruta      Int? 
+  numero       String? @db.VarChar(255)
+  matricula    String? @db.VarChar(255)
+  conductor    conductor[]
+  duenos       duenos? @relation(fields: [id_dueno], references: [id_dueno], onDelete: NoAction, onUpdate: NoAction, map: "fk_vehiculos_duenos")
+  rutas        rutas? @relation(fields: [id_ruta], references: [id_ruta], onDelete: NoAction, onUpdate: NoAction, map: "fk_vehiculos_rutas") // Nueva relación con rutas
 }
 
 model conductor {
@@ -85,17 +86,14 @@ model conductor {
   usuarios     usuarios?  @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_conductor_usuarios")
   vehiculos    vehiculos? @relation(fields: [id_vehiculos], references: [id_vehiculos], onDelete: NoAction, onUpdate: NoAction, map: "fk_conductor_vehiculos")
 }
-
 model rutas_paradas_orden {
-  id_orden     Int        @id @default(autoincrement())
-  id_ruta      Int?
-  id_parada    Int?
-  id_vehiculos Int?
-  orden        Int?
-  activo       Int?       @db.SmallInt
-  paradas      paradas?   @relation(fields: [id_parada], references: [id_parada], onDelete: NoAction, onUpdate: NoAction, map: "fk_rutas_paradas_orden_paradas")
-  rutas        rutas?     @relation(fields: [id_ruta], references: [id_ruta], onDelete: NoAction, onUpdate: NoAction, map: "fk_rutas_paradas_orden_rutas")
-  vehiculos    vehiculos? @relation(fields: [id_vehiculos], references: [id_vehiculos], onDelete: NoAction, onUpdate: NoAction, map: "fk_rutas_paradas_orden_vehiculos")
+  id_orden  Int      @id @default(autoincrement())
+  id_ruta   Int?
+  id_parada Int?
+  orden     Int?
+  activo    Int?     @db.SmallInt
+  paradas   paradas? @relation(fields: [id_parada], references: [id_parada], onDelete: NoAction, onUpdate: NoAction, map: "fk_rutas_paradas_orden_paradas")
+  rutas     rutas?   @relation(fields: [id_ruta], references: [id_ruta], onDelete: NoAction, onUpdate: NoAction, map: "fk_rutas_paradas_orden_rutas")
 }
 
 model tipo_usuarios {
