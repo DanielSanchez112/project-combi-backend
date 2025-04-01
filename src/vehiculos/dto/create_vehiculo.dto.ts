@@ -5,7 +5,8 @@ export class CreateVehiculoDto{
     id_dueno: number
 
     @IsNumber()
-    id_ruta?: number
+    @IsOptional()
+    id_ruta?: number | null
 
     @IsString()
     numero: string

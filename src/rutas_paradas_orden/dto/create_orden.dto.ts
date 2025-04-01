@@ -1,6 +1,5 @@
-import { IsArray, IsDecimal, IsNumber, IsString, ValidateNested } from "class-validator"
+import { IsArray, IsDecimal, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator"
 import { Type } from 'class-transformer';
-import { Decimal } from "@prisma/client/runtime/library";
 
 export class CreateOrdenDto{
     @IsString()
@@ -14,6 +13,10 @@ export class CreateOrdenDto{
   
     @IsNumber()
     orden: number;
+
+    @IsOptional()
+    @IsNumber()
+    id_parada?: number
 }
 
 export class CreateRutaConOrdenDto {

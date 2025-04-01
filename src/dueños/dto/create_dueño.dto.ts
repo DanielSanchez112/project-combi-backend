@@ -6,6 +6,5 @@ export class CreateDueñoDto{
 
     @IsNumber()
     @IsOptional()
-    id_vehiculos?: number | null
-
+    id_vehiculos?: number
 }
