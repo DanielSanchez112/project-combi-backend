@@ -1,9 +1,12 @@
-import {Injectable, NotFoundException} from '@nestjs/common'
+import {Injectable, NotFoundException, UseFilters, UseInterceptors} from '@nestjs/common'
 import {PrismaService} from '../prisma.service'
 import {CreateTipoUsuarioDto} from './dto/create_tipo_usuario.dto'
 import {UpdateTipoUsuarioDto} from './dto/update_tipo_usuario.dto'
+import { GlobalExceptionFilter } from 'src/GEF'
+import { SuccessInterceptor } from 'src/SI'
 
 @Injectable()
+
 export class TipoUsuarioService{
     constructor(private prisma: PrismaService) {}
 
