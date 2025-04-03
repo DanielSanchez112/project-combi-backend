@@ -147,13 +147,20 @@ export class OrdenService{
     
     //buscar todas las rutas
     async findAll(){
-        return this.prisma.rutas.findMany()
+        return this.prisma.rutas_paradas_orden.findMany({
+            include: {
+                paradas: true
+            }
+        })
     }
 
     //buscar ruta mediante id
     async findOne(id: number){
-        return this.prisma.rutas.findUnique({
-            where: {id_ruta: id}
+        return this.prisma.rutas_paradas_orden.findMany({
+            where: {id_ruta: id},
+            include: {
+                paradas: true
+            }
         })
     }
 

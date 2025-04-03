@@ -9,12 +9,22 @@ async function boostrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:5173'], // Permitir solo estos dominios
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
-    allowedHeaders: 'Content-Type,Authorization', // Encabezados permitidos
-    credentials: true, // Permitir cookies y autenticación en CORS
+    origin: '*', // O usa tu dominio específico
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true, // Si usas autenticación con cookies o tokens
   });
   
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      return res.status(200).json({});
+    }
+    next();
+  });
+
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true
@@ -24,6 +34,4 @@ async function boostrap() {
   await app.listen(process.env.PORT || 3000)
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
-
-
 boostrap()
