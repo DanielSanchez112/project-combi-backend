@@ -11,9 +11,9 @@ export class UsuariosController {
     @Post()
     @UsePipes(new ValidationPipe({ whitelist: true })) 
     create(@Req() request: Request, @Body() createUsuarioDto: CreateUsuarioDto) {
-      console.log('🔥 Datos recibidos:', JSON.stringify(createUsuarioDto, null, 2))
-      console.log('Request:', request);
-      console.log('Body:', createUsuarioDto);
+      // console.log('🔥 Datos recibidos:', JSON.stringify(createUsuarioDto, null, 2))
+      // console.log('Request:', request);
+      // console.log('Body:', createUsuarioDto);
       return this.usuariosService.create(createUsuarioDto);
   }
 
