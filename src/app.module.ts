@@ -7,6 +7,7 @@ import { PrismaService } from './prisma.service';
 import { VehiculosModule } from './vehiculos/vehiculos.module';
 import { RutasModule } from './rutas/ruats.model';
 import { RutasParadasOrdenModule } from './rutas_paradas_orden/orden.module';
+import { ConductoresModule } from './conductores/conductores.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RutasParadasOrdenModule } from './rutas_paradas_orden/orden.module';
     VehiculosModule,
     RutasModule,
     RutasParadasOrdenModule,
+    ConductoresModule,
   ],
   providers: [PrismaService],
 })

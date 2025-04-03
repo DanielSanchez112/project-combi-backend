@@ -1,4 +1,4 @@
-import { IsNumber } from "class-validator"
+import { isNumber, IsNumber } from "class-validator"
 
 
 export class CreateConductoresDto{
@@ -7,5 +7,4 @@ export class CreateConductoresDto{
 
     @IsNumber()
     id_usuario?: number
-
 }

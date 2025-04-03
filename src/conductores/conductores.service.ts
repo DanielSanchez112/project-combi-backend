@@ -16,13 +16,16 @@ export class ConductoresService{
 
     //buscar todos los conductores
     async findAll(){
-        return this.prisma.conductor.findMany()
+        return this.prisma.conductor.findMany({
+            include: { usuarios: { include: {personas: true} }}
+        })
     }
 
     //buscar conductor mediante id
     async findOne(id: number){
         return this.prisma.conductor.findUnique({
-            where: {id_conductor: id}
+            where: {id_conductor: id},
+            include: {usuarios: { include: {personas: true}}}
         })
     }
 

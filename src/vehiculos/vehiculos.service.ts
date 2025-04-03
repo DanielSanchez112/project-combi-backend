@@ -52,7 +52,8 @@ export class VehiculosService{
     //buscar vehiculos por dueño
     async findByOwner(id: number){
         return this.prisma.vehiculos.findMany({
-            where: {id_dueno: id}
+            where: {id_dueno: id},
+            include: {rutas: true}
         })
     }
 
