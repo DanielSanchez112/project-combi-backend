@@ -10,6 +10,7 @@ export class ConfirmMiddleware implements NestMiddleware {
     const userAgent = req.headers['user-agent'] // Dispositivo/Navegador
     const authHeader = req.headers['authorization'] // Token si usa autenticación
 
+    console.log(`\n\n🔹 Request Details:`)
     console.log(`[${new Date().toISOString()}] ${method} ${url}`)
     console.log(`🔹 IP: ${ip}`)
     console.log(`🔹 User-Agent: ${userAgent}`)
@@ -17,7 +18,23 @@ export class ConfirmMiddleware implements NestMiddleware {
     if (authHeader) {
       console.log(`🔹 Token: ${authHeader}`)
     }
-    console.log('\n')
+    console.log(`🔹 Headers:`)
+    console.log(req.headers)
+    console.log(`🔹 Body:`)
+    console.log(req.body)
+    console.log(`🔹 Query:`)
+    console.log(req.query)
+    console.log(`🔹 Params:`)
+    console.log(req.params)
+    console.log('response:')
+    console.log(res.statusCode)
+    console.log(res.statusMessage)
+    console.log(res.headersSent)
+    console.log(res.getHeaders())
+    console.log('----------------------DONE----------------------\n')
+
+
+
     next();
   }
 }
