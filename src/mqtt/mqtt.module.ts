@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MqttController } from './mqtt.controller';
 import { MqttService } from './mqtt.service';
+import { MqttSubscriptionsController } from './mqtSub.controller';
 
 @Module({
   imports: [
@@ -10,12 +11,16 @@ import { MqttService } from './mqtt.service';
         name: 'MQTT_SERVICE',
         transport: Transport.MQTT,
         options: {
-          url: 'mqtt://localhost:1883', // o el host de tu broker EMQX o Mosquitto
+          url: process.env.MQTT_URL || 'mqtt://localhost:1883',
+          clientId: 'mqtt-nestjs-client',
+          subscribeOptions: {
+            qos: 1,
+          },
         },
       },
     ]),
   ],
-  controllers: [MqttController],
+  controllers: [MqttController, MqttSubscriptionsController], // Añadido el nuevo controlador
   providers: [MqttService],
   exports: [MqttService],
 })
