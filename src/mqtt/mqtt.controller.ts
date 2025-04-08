@@ -5,7 +5,7 @@ import { MqttService } from './mqtt.service';
 export class MqttController {
   constructor(private readonly mqttService: MqttService) {}
 
-  @Post(':rutaId')
+  @Post('ruta/:rutaId')
   async publicarUbicacion(
     @Param('rutaId') rutaId: number,
     @Body() body: { lat: number; lng: number; idVehiculo: number },

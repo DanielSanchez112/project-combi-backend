@@ -1,11 +1,9 @@
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import Aedes, * as aedes from 'aedes';
 
 @Injectable()
 export class MqttService implements OnModuleInit {
-    private broker: Aedes;
 
     constructor(
         @Inject('MQTT_SERVICE') private readonly mqttClient: ClientProxy,
