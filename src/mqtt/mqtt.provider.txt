@@ -1,0 +1,10 @@
+import { MqttClient } from "mqtt/*";
+
+
+export const mqttProviders = [{
+    provider: 'MQTT_SERVICE',
+    userFactory: (): MqttClient => {
+        const mqtt = require('mqtt')
+        return mqtt.connect('mqtt://localhost:1883')
+    }
+}]

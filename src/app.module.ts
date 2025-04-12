@@ -11,6 +11,7 @@ import { VehiculosModule } from './vehiculos/vehiculos.module';
 import { RutasModule } from './rutas/ruats.model';
 import { RutasParadasOrdenModule } from './rutas_paradas_orden/orden.module';
 import { ConductoresModule } from './conductores/conductores.module';
+import { MqttModule } from './mqtt/mqtt.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConductoresModule } from './conductores/conductores.module';
     RutasModule,
     RutasParadasOrdenModule,
     ConductoresModule,
+    MqttModule,
   ],
   providers: [PrismaService],
 })
